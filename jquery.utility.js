@@ -21,7 +21,8 @@
        'input[type="number"]',
        'select',
        'textarea']}
-     ]
+     ],
+     ['validity', { message : 'この項目は入力必須です。'}]
    ]);
    var TEXT = new Map([
      ['failedCreateMessage','オブジェクト作成に失敗しました。'],
@@ -1478,6 +1479,36 @@
    {
      return this.each(function() {
        enterNextInternal.call(this,$.extend(true,{},CONFIG.get('enterNext'),options)); 
+     });
+   };
+
+   let validity = function(message)
+   {
+     if(message.length == 0)
+       message = CONFING.get('validity').message;
+
+     $(this)
+       .on('invalid',function(ev) {
+         if(this.validity.valueMissing || this.validity.patternMismatch || this.validity.typeMismatch)
+         {
+           this.setCustomValidity(message);
+         }
+         else
+         {
+           this.setCustomValidity('');
+           ev.preventDefault();
+         }
+       })
+      .on('input',function(ev) {
+        this.setCustomValidity('');
+      });
+   };
+   
+   //plugin body
+   $.fn.validity = function(message)
+   {
+     return this.each(function () {
+       validity.call(this, message);
      });
    };
 
