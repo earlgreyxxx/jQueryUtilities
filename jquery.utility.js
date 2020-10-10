@@ -8,11 +8,21 @@
 
 (function($,undefined)
  {
-   var CONFIG = new Map([
+   let CONFIG = new Map([
      ['waitUntilBlocking',500],
      ['defaultExpire',259200],
      ['defaultDuration',200],
-     ['blockingTimeout',15*1000]
+     ['blockingTimeout',15*1000],
+     ['enterNext',{ selector : [
+       'input[type="text"]',
+       'input[type="tel"]',
+       'input[type="password"]',
+       'input[type="email"]',
+       'input[type="number"]',
+       'select',
+       'textarea']}
+     ],
+     ['validity', { message : 'この項目は入力必須です。'}]
    ]);
    var TEXT = new Map([
      ['failedCreateMessage','オブジェクト作成に失敗しました。'],
@@ -1438,6 +1448,67 @@
            }
          }
        });
+     });
+   };
+
+   let enterNextInternal = function(setting)
+   {
+     let selectors = setting.selectors.join(',');
+     let $controls = $(selectors,this);
+     let lastIndex = $controls.length - 1;
+     let onKeyDown =  function(ev) 
+     {
+       if(this.tagName.match(/(?:input|select)/i) && ev.keyCode == 13)
+       {
+         let currentIndex = $controls.index(this);
+         let nextIndex = currentIndex + 1;
+         if(currentIndex == lastIndex)
+           nextIndex = 0;
+
+         let nextObject = $controls.get(nextIndex);
+         nextObject.focus();
+         if('select' in nextObject && $.isFunction(nextObject.select))
+           nextObject.select();
+       }
+     };
+
+     $(this).off('.enterNext').on('keydown.enterNext',selectors,onKeyDown);
+   };
+   
+   $.fn.enterNext = function(options)
+   {
+     return this.each(function() {
+       enterNextInternal.call(this,$.extend(true,{},CONFIG.get('enterNext'),options)); 
+     });
+   };
+
+   let validity = function(message)
+   {
+     if(message.length == 0)
+       message = CONFING.get('validity').message;
+
+     $(this)
+       .on('invalid',function(ev) {
+         if(this.validity.valueMissing || this.validity.patternMismatch || this.validity.typeMismatch)
+         {
+           this.setCustomValidity(message);
+         }
+         else
+         {
+           this.setCustomValidity('');
+           ev.preventDefault();
+         }
+       })
+      .on('input',function(ev) {
+        this.setCustomValidity('');
+      });
+   };
+   
+   //plugin body
+   $.fn.validity = function(message)
+   {
+     return this.each(function () {
+       validity.call(this, message);
      });
    };
 
