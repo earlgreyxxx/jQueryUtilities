@@ -656,29 +656,6 @@
 
    /*****************************************************************************
 
-     ユーザーエージェント(ブラウザ分岐)
-
-   *****************************************************************************/
-   $.userAgent =
-     {
-       firefox : window.hasOwnProperty('sidebar'),
-       opera   : window.hasOwnProperty('opera'),
-       webkit  : !document.uniqueID && !window.hasOwnProperty('opera') && !window.hasOwnProperty('sidebar') && window.hasOwnProperty('localStorage') && window.orientation === undefined,
-
-       mobile  : window.orientation !== undefined,
-       ipad    : navigator.userAgent.match(/iPad/i),
-       touch   : document.ontouchstart !== undefined
-     };
-
-   $.userAgent.ie7 = !$.userAgent.ie6 && window.addEventListener === undefined && document.querySelectorAll === undefined;
-   $.userAgent.ie8 = !$.userAgent.ie6 && !$.userAgent.ie7 && window.addEventListener === undefined && document.getElementsByClassName === undefined;
-   $.userAgent.ie9 = !$.userAgent.ie8 && !$.userAgent.ie6 && !$.userAgent.ie7 && document.uniqueID;
-   $.userAgent.ielte8 = ($.userAgent.ie6 || $.userAgent.ie7 || $.userAgent.ie8);
-   $.userAgent.ie  = window.navigator.userAgent.toLowerCase().indexOf('msie') != -1;
-   $.userAgent.retina  = ($.userAgent.touch && $.userAgent.ipad && window.devicePixelRatio !== undefined) ? window.devicePixelRatio : 1;
-
-   /*****************************************************************************
-
      簡易オーバーレイ
 
    *****************************************************************************/
